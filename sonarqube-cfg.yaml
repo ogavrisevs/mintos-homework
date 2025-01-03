@@ -1,0 +1,27 @@
+
+ingress:
+  enabled: true
+  hosts:
+    - name: sonarqube.homework.com
+
+postgresql:
+  enabled: false
+
+jdbcOverwrite:
+  enabled: true
+  jdbcUrl: "jdbc:postgresql://postgresql.default.svc.cluster.local:5432/sonarqube"
+
+persistence:
+  enabled: true
+  storageClass: "standard"
+  accessMode: ReadWriteOnce
+  size: 10Gi
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1024Mi
+  requests:
+    cpu: 250m
+    memory: 512Mi
+    
