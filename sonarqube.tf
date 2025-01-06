@@ -5,7 +5,8 @@ resource "helm_release" "sonarqube" {
   namespace  = kubernetes_namespace.homework.metadata[0].name
 
   values = [
-    "${file("${path.module}/sonarqube-cf.yaml")}"
+    "${file("${path.module}/sonarqube-cfg.yaml")}"
   ]
+  depends_on = [null_resource.install_helm]
 }
 

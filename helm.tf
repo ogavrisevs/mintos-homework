@@ -1,4 +1,4 @@
-resource "null_resource" "install_docker" {
+resource "null_resource" "install_helm" {
   provisioner "local-exec" {
     command = <<EOT
       # Update apt and install required dependencies
@@ -18,6 +18,7 @@ resource "null_resource" "install_docker" {
       
     EOT
   }
+  depends_on = [null_resource.install_minikube]
 }
 
 

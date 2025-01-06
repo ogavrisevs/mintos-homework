@@ -64,5 +64,49 @@ resource "aws_instance" "ec2" {
   tags = {
     Name = "ec2"
   }
+
   depends_on = [aws_security_group.sg]
+}
+
+resource "null_resource" "copy_files" {
+  provisioner "file" {
+    source      = "./../../mintos-homework"
+    destination = "/home/ubuntu"
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = "${file("~/.ssh/id_rsa")}"
+      host        = aws_instance.ec2.public_ip
+    }
+  }
+
+  triggers = {
+    trigger_value = "${timestamp()}"
+  }
+  depends_on = [aws_instance.ec2]
+}
+
+resource "null_resource" "exec_bash" {
+  provisioner "remote-exec" {
+    inline = [". /home/ubuntu/mintos-homework/run.sh"]
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = "${file("~/.ssh/id_rsa")}"
+      host        = aws_instance.ec2.public_ip
+    }
+  }
+
+  triggers = {
+    trigger_value = "${timestamp()}"
+  }
+
+  depends_on = [null_resource.copy_files]
+
+}
+
+output "instance_public_ip" {
+  description = "Public IP "
+  value       = aws_instance.ec2.public_ip
 }
