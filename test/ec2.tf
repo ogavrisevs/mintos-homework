@@ -49,7 +49,7 @@ resource "aws_security_group" "sg" {
 
 resource "aws_instance" "ec2" {
   ami           = "ami-0a628e1e89aaedf80"
-  instance_type = "t3.small"
+  instance_type = "t3.large"
   subnet_id     = "subnet-02e83f98fd9ff0004"
   key_name      = "oskars"
 
@@ -57,7 +57,7 @@ resource "aws_instance" "ec2" {
   vpc_security_group_ids = [ aws_security_group.sg.id,]
 
   root_block_device {
-    volume_size = 40  
+    volume_size = 60
     volume_type = "gp3"
   }
 
@@ -81,15 +81,22 @@ resource "null_resource" "copy_files" {
     }
   }
 
-  triggers = {
-    trigger_value = "${timestamp()}"
-  }
+  #triggers = {
+  #  trigger_value = "${timestamp()}"
+  #}
   depends_on = [aws_instance.ec2]
 }
 
 resource "null_resource" "exec_bash" {
   provisioner "remote-exec" {
-    inline = [". /home/ubuntu/mintos-homework/run.sh"]
+    inline = [
+      "set -x",
+      "cd /home/ubuntu/mintos-homework/",
+      "chmod +x run.sh",
+      "./run.sh",
+      "EXIT_CODE=$?",
+      "exit $EXIT_CODE"
+    ]
     connection {
       type        = "ssh"
       user        = "ubuntu"
@@ -98,12 +105,10 @@ resource "null_resource" "exec_bash" {
     }
   }
 
-  triggers = {
-    trigger_value = "${timestamp()}"
-  }
-
+  #triggers = {
+  #  trigger_value = "${timestamp()}"
+  #}
   depends_on = [null_resource.copy_files]
-
 }
 
 output "instance_public_ip" {

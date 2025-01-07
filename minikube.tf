@@ -22,7 +22,6 @@ resource "null_resource" "install_minikube" {
       rm minikube
     EOT
   }
-  depends_on = [null_resource.install_docker]
 }
 
 # Install kubectl using a local resource
