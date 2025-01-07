@@ -1,13 +1,12 @@
-resource "helm_release" "sonarqube" {
-  name       = "sonarqube"
+resource "helm_release" "postgresql" {
+  name       = "postgresql"
   repository = "oci://registry-1.docker.io/bitnamicharts"
-  chart      = "sonarqube"
-  version    = "6.2.0"
+  chart      = "postgresql"
+  version    = "16.3.5"
   namespace  = kubernetes_namespace.homework.metadata[0].name
 
   values = [
-    "${file("${path.module}/sonarqube-cfg.yaml")}"
+    "${file("${path.module}/postgresql-cfg.yaml")}"
   ]
   depends_on = [null_resource.install_helm]
 }
-

@@ -1,0 +1,18 @@
+global:
+  postgresql:
+    auth: 
+      username: sonaruser
+      password: sonarpass
+      database: sonarqube
+
+auth:
+  username: sonaruser
+  password: sonarpass
+  database: sonarqube
+
+primary:
+  persistence:
+    enabled: false
+    size: 10Gi
+
+      
