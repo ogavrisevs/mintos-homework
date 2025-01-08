@@ -8,5 +8,5 @@ resource "helm_release" "postgresql" {
   values = [
     "${file("${path.module}/postgresql-cfg.yaml")}"
   ]
-  depends_on = [null_resource.install_helm]
+  depends_on = [kubernetes_namespace.homework]
 }

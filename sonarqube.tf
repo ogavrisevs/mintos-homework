@@ -4,10 +4,10 @@ resource "helm_release" "sonarqube" {
   chart      = "sonarqube"
   version    = "6.2.0"
   namespace  = kubernetes_namespace.homework.metadata[0].name
+  timeout = "1200"
 
   values = [
     "${file("${path.module}/sonarqube-cfg.yaml")}"
   ]
-  depends_on = [null_resource.install_helm]
+  depends_on = [helm_release.postgresql]
 }
-

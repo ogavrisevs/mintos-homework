@@ -78,9 +78,11 @@ resource "null_resource" "copy_files" {
       user        = "ubuntu"
       private_key = "${file("~/.ssh/id_rsa")}"
       host        = aws_instance.ec2.public_ip
+      timeout     = "10m"
+
     }
   }
-
+  
   #triggers = {
   #  trigger_value = "${timestamp()}"
   #}

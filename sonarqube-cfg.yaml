@@ -26,10 +26,10 @@ resourcesPreset: large
 resources:
   limits:
     cpu: 2
-    memory: 5120Mi
+    memory: 5Gi
   requests:
     cpu: 1
-    memory: 4096Mi
+    memory: 4Gi
 
 service:
-  type: ClusterIP
+  type: NodePort
