@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x 
 echo "Current working directory: $(pwd)"
 
 echo "Install terrafrom"
@@ -21,7 +22,36 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io
 sudo systemctl enable docker
 sudo systemctl start docker
 sudo usermod -aG docker $USER
-newgrp docker
+group=docker
+if [ $(id -gn) != $group ]; then
+  exec sg $group "$0 $*"
+fi
+
+echo "Install minikube"
+sudo apt update -y
+sudo apt install -y apt-transport-https curl software-properties-common conntrack
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube /usr/local/bin/
+minikube start --memory=6144
+minikube addons enable ingress
+minikube status
+rm minikube
+
+echo "Install kubectl"
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+sudo install kubectl /usr/local/bin/
+rm kubectl
+kubectl get all 
+
+echo "Install helm"
+sudo apt-get update -y
+sudo apt-get install -y curl apt-transport-https
+curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+sudo apt-get update -y
+sudo apt-get install -y helm
+helm version
+helm list
 
 echo "Run terrafrom plan"
 terraform version 
