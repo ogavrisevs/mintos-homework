@@ -1,19 +1,21 @@
 Intro
 -------
 
-    This project automates the setup of a containerized development environment using Bash to install Docker, Minikube, Helm, and kubectl. Using Helm, it deploys PostgreSQL and SonarQube, with SonarQube persisting data using a Persistent Volume Claim (PVC). Resource limits are configured for both applications to optimize performance and prevent overuse of cluster resources. Additionally, SonarQube is exposed to external traffic through an Ingress resource, enabling easy access for code quality analysis. 
+This project automates the setup of a containerized development environment using Bash to install Docker, Minikube, Helm, and kubectl. Using Helm, it deploys PostgreSQL and SonarQube, with SonarQube persisting data using a Persistent Volume Claim (PVC). Resource limits are configured for both applications to optimize performance and prevent overuse of cluster resources. Additionally, SonarQube is exposed to external traffic through an Ingress resource, enabling easy access for code quality analysis. 
 
 Requirements 
 -------------
 
-    Depednecys : 
-        * packages : curl, git, wget 
-        * resources : 8 GB of memory and 2x CPU 
-        * `ubuntu` users with rights to escalate privileges without password
+Depednecys : 
 
-    Code is tested on : 
-        * AWS ec2 instance with Ubuntu Noble 24.04
-        * MacOS Sequoia 15.2
+    * packages : curl, git, wget 
+    * resources : 8 GB of memory and 2x CPU 
+    * `ubuntu` users with rights to escalate privileges without password
+
+Code is tested on : 
+
+    * AWS ec2 instance with Ubuntu Noble 24.04
+    * MacOS Sequoia 15.2
 
 Installation 
 -------------
@@ -44,7 +46,7 @@ Clean up
 Testing 
 ---------
 
-    Run terrafrom `ec2.tf` from `test` folder, it will spin up ec2 instance in AWS (set up aws credentials on instance and replace aws.vpc, subnet , and profile id's), copy files and execute `run.sh` script. 
+Run terrafrom `ec2.tf` from `test` folder, it will spin up ec2 instance in AWS (set up aws credentials on instance and replace aws.vpc, subnet , and profile id's), copy files and execute `run.sh` script. 
 
 Limitations / known bugs 
 --------------------------
