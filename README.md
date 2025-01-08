@@ -1,62 +1,63 @@
 Intro
 -------
 
-    This repo contains Mintos homework 
+    This project automates the setup of a containerized development environment using Bash to install Docker, Minikube, Helm, and kubectl. Using Helm, it deploys PostgreSQL and SonarQube, with SonarQube persisting data using a Persistent Volume Claim (PVC). Resource limits are configured for both applications to optimize performance and prevent overuse of cluster resources. Additionally, SonarQube is exposed to external traffic through an Ingress resource, enabling easy access for code quality analysis. 
 
-Install on mac
----------------
-
-    brew install minikube
-    minikube start 
-    minikube addons enable ingress
-    minikube ip
-
-Install / Test ingress 
---------------------------
-
-    minikube addons enable ingress
-    minikube addons list
-    kubectl get pods -n ingress-nginx
-    kubectl create deployment web --image=gcr.io/google-samples/hello-app:1.0
-    kubectl expose deployment web --type=NodePort --port=8080
-    kubectl get service web
-    minikube service web --url
-    curl http://127.0.0.1:53915
-    kubectl apply -f https://k8s.io/examples/service/networking/example-ingress.yaml
-    curl --resolve "hello-world.example:80:192.168.49.2" -i http://hello-world.example
-
-    curl --resolve "hello-world.example:31166:3.68.215.25" -i http://hello-world.example
-
-Manual steps 
+Requirements 
 -------------
 
-    rsync -a ~/work-priv/mintos-homework/ ubuntu@3.68.215.25:/home/ubuntu/mintos-homework/ 
-    terraform init
+    Depednecys : 
+        * packages : curl, git, wget 
+        * resources : 8 GB of memory and 2x CPU 
+        * `ubuntu` users with rights to escalate privileges without password
 
-Dashboard 
---------------
+    Code is tested on : 
+        * AWS ec2 instance with Ubuntu Noble 24.04
+        * MacOS Sequoia 15.2
 
-    minikube dashboard --url
-    ssh -L 8081:localhost:36127 ubuntu@3.68.215.25
-    curl http://127.0.0.1:8081/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/
+Installation 
+-------------
 
-Install postgresql
-------------------
+On clean instance execute: 
 
-    helm install postgresql oci://registry-1.docker.io/bitnamicharts/postgresql
-    export POSTGRES_PASSWORD=$(kubectl get secret --namespace default postgresql -o jsonpath="{.data.postgres-password}" | base64 -d)
-    kubectl run -i --tty psql-client --image=postgres:latest --env="PGPASSWORD=yourpassword" --restart=Never -- bash -c "sleep infinity"
-    kubectl exec -it psql-client -- /bin/bash
-    psql -h postgresql.default.svc.cluster.local -U postgres -d postgres -W 
-      - pwd  > vYDijhzkSs
+    ubuntu@remote-host:~$ git clone git@github.com:ogavrisevs/mintos-homework.git
+    ubuntu@remote-host:~$ cd mintos-homework
+    ubuntu@remote-host:~$ ./run.sh
 
-Install sonarqube
-------------------
+Access sonarqube (on remote insatnce): 
 
-    helm repo add sonarqube https://SonarSource.github.io/helm-chart-sonarqube
-    helm repo update
-    helm upgrade --install sonarqube sonarqube/sonarqube -f sonarqube-cfg.yaml
+    ubuntu@remote-host:~$ minikube service sonarqube -n homework --url
+    ubuntu@remote-host:~$ ssh -L 8081:192.168.49.2:32484 ubuntu@3.76.80.132
+    mac@localhost-host:~$ (open browser) http://127.0.0.1:8081 // (user: "user", password : "pwd")
+
+Access sonarqube (on localhost): 
+
+    minikube tunel 
+    echo "127.0.0.1  sonarqube.homework.com" | sudo tee -a /etc/hosts
+    open browser http://sonarqube.homework.com  // (user: "user", password : "pwd")
+
+Clean up 
+--------
+
+    terraform destroy 
+
+Testing 
+---------
+
+    Run terrafrom `ec2.tf` from `test` folder, it will spin up ec2 instance in AWS (set up aws credentials on instance and replace aws.vpc, subnet , and profile id's), copy files and execute `run.sh` script. 
+
+Limitations / known bugs 
+--------------------------
+
+    * Sometimes on clean install sonarqube pod can restart.
+    * When accessing sonarqube on remote instance tunel is attached to service and ingress is obsolete. 
+    * When files are copy from local host to remote it can take up to ~ 10 min because it copy also terraform temp files (providers / state / etc.). 
 
 
-    export POD_NAME=$(kubectl get pods --namespace default -l "app=sonarqube,release=sonarqube" -o jsonpath="{.items[0].metadata.name}")
-    kubectl port-forward $POD_NAME 8080:9000 -n default
+Feature improvments 
+--------------------
+
+    * Store passwords in k8s secret and/or secret manager. 
+    * Collect logs and metrics.
+    * Memory limitation is set on minikube and seperate services this can be set as variable. 
+    * All endpoints in cluster must be secured with TLS.

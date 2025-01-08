@@ -7,3 +7,7 @@ This folder contains test unit for main task, it will create ec2 instance in AWS
 -- run 
 
     terraform apply 
+
+-- clean up 
+    
+    terraform destroy
